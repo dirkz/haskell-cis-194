@@ -1,6 +1,6 @@
 module Golf where
 
-import Data.List (zip, sort, group)
+import Data.List (zip, sort, group, intercalate)
 import qualified Data.Map as Map
 
 -- exercise 1
@@ -29,24 +29,29 @@ localMaxima xs = map (\(a:b:ys) -> b) $ filter (\(a:b:c:ys) -> b > a && b > c) $
 
 -- exercise 3
 
--- get a list of tuples of frequencies of all elements in xs
-freq :: Ord a => [a] -> Map.Map a Integer
+-- get an association map of numbers to their frequencies
+freq :: [Integer] -> Map.Map Integer Integer
 -- foldr over the list, using an empty association map as starting accumulator,
 -- and using insertWith to add 1 to existing counts
 freq xs = foldr (\x list -> Map.insertWith (+) x 1 list) (Map.fromList []) xs
 
--- returns the frequencey of a given number, or 0
---frequency :: Ord a => Map.Map a Integer -> Integer -> a
---frequency freq n = 
+-- returns '*' or ' ', depending on whether the given Maybe frequency
+-- has reached the given target frequency
+asterisk :: Integer -> Maybe Integer -> Char
+asterisk l Nothing = ' '
+asterisk l (Just freq) = if freq >= l then '*' else ' '
 
--- get a string of '*' for the given level, given a frequency map
---histString :: Map.Map a Integer -> Integer -> String
---histString freq lvl = map () [0,1..9]
+-- returns a string of '*' for a given level
+levelString :: Map.Map Integer Integer -> Integer -> String
+levelString freqs n = map (\col -> asterisk n $ Map.lookup col freqs) [0,1..9]
 
--- returns an array of strings with '*' for each level (9-0)
---histStrings :: Map.Map a Integer -> [String]
---histStrings freq = map () [9,8..0]
+-- Maps levelString over all frequency-levels, producing a vertical histogram.
+-- Then drops empty (space-only) lines, then glues with intercalate and "\n"
+hString :: [Integer] -> String
+hString xs = let freqs = freq xs in
+  (intercalate "\n") . (dropWhile (\s -> s == (levelString (freq []) 0)))
+  $ (map (levelString freqs) [9,8..1])
 
+-- Calls hString (which does the actual work) and adds some textual decoration
 histogram :: [Integer] -> String
-histogram xs = let f = freq xs in
-  "h"
+histogram xs = "\n" ++ (hString xs) ++ "\n==========\n0123456789\n"
