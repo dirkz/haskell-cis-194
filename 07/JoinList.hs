@@ -2,6 +2,7 @@ module JoinList where
 
 import Data.Monoid
 import Sized
+import Debug.Trace (trace)
 
 data JoinList m a = Empty
     | Single m a
@@ -32,22 +33,23 @@ jlToList Empty = []
 jlToList (Single _ a) = [a]
 jlToList (Append _ l1 l2) = jlToList l1 ++ jlToList l2
 
-sizeInt :: Sized a => a -> Int
-sizeInt = getSize . size
+getSizeInt :: Sized a => a -> Int
+getSizeInt = getSize . size
 
-indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
+indexJ :: (Show a, Show b, Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
+indexJ i l | trace ("indexJ " ++ show i ++ " " ++ show l) False = undefined
 indexJ _ Empty = Nothing
-indexJ i l = search 0 i l
-    where
-        search :: Sized b => Int -> b -> JoinList b a
-        search _ _ Empty = Nothing
-        search index i (Single m a)
-            | index == i = Just a
-            | otherwise = Nothing
-        search index i (Append m left right)
-            | index < tag left = search index i left
-            | index < tag right = search index i right
-            | otherwise = Nothing
+indexJ n (Single m a)
+    | n == (getSizeInt m) + 1 = Just a
+    | otherwise = Nothing
+indexJ n (Append m l1 l2)
+    | n >= getSizeInt m = Nothing
+    | otherwise =
+        let s1 = getSizeInt $ tag l1
+            s2 = getSizeInt $ tag l2
+        in
+            if n < s1 then indexJ n l1
+            else if n < (s1 + s2) then indexJ n l2 else Nothing
 
-indexedJList :: JoinList Integer Char
-indexedJList = (Append 4 (Append 2 (Single 1 'a') (Single 1 'b')) (Append 2 (Single 1 'c') (Single 1 'd')))
+sampleJList :: JoinList Size Char
+sampleJList = (Append 4 (Append 2 (Single 1 'a') (Single 1 'b')) (Append 2 (Single 1 'c') (Single 1 'd')))
