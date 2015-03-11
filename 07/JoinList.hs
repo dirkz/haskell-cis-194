@@ -52,4 +52,6 @@ indexJ n (Append m l1 l2)
             else if n < (s1 + s2) then indexJ n l2 else Nothing
 
 sampleJList :: JoinList Size Char
-sampleJList = (Append 4 (Append 2 (Single 1 'a') (Single 1 'b')) (Append 2 (Single 1 'c') (Single 1 'd')))
+sampleJList = (Append 4
+                (Append 2 (Single 1 'a') (Single 1 'b'))
+                (Append 2 (Single 1 'c') (Single 1 'd')))
