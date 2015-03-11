@@ -40,7 +40,7 @@ indexJ :: (Show a, Show b, Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
 indexJ i l | trace ("indexJ " ++ show i ++ " " ++ show l) False = undefined
 indexJ _ Empty = Nothing
 indexJ n (Single m a)
-    | n == (getSizeInt m) + 1 = Just a
+    | n == 0 = Just a
     | otherwise = Nothing
 indexJ n (Append m l1 l2)
     | n >= getSizeInt m = Nothing
