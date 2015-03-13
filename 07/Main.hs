@@ -45,9 +45,10 @@ main = do
     --forM_ [0..8] $ print . checkTake sampleJList2
     --print $ scoreLine "yay " +++ scoreLine "haskell!"
     let buffer = fromString "Line 1\nLine 2\nLine 3" :: JoinList (Score, Size) String
-    print $ buffer
+    --print $ buffer
     --print $ line 1 buffer
+    --print $ replaceLine 1 "hi" buffer
     --print $ replaceLine 0 "hi" (Single (Score 0, Size 0) "what")
     --print $ replaceLine 0 "hi" (Empty :: JoinList (Score, Size) String)
     --print $ replaceLine 1 "hi" (Single (Score 0, Size 0) "what")
-    --runEditor editor buffer
+    runEditor editor buffer

@@ -20,7 +20,7 @@ instance Buffer (JoinList (Score, Size) String) where
 
     line = indexJ
 
-    replaceLine n s Empty = Single (scoreString s, Size 0) s
+    replaceLine n s Empty = Single (scoreString s, Size 1) s
     replaceLine n s orig@(Single m _)
         | n == 0 = Single (scoreString s, snd m) s
         | otherwise = orig
@@ -30,7 +30,7 @@ instance Buffer (JoinList (Score, Size) String) where
                 newLeft = replaceLine n s left
                 newTag = (tag newLeft) <> (tag right)
             in Append newTag newLeft right
-        | n < sizeRight =
+        | n < (sizeLeft + sizeRight) =
             let
                 newRight = replaceLine (n - sizeLeft) s right
                 newTag = (tag left) <> (tag newRight)
