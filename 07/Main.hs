@@ -36,3 +36,4 @@ main = do
     forM_ [0..8] $ print . checkDrop sampleJList2
     forM_ [0..6] $ print . checkTake sampleJList1
     forM_ [0..8] $ print . checkTake sampleJList2
+    print $ scoreLine "yay " +++ scoreLine "haskell!"
