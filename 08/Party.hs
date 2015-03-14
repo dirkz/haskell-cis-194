@@ -32,6 +32,18 @@ treeFold f acc t = foldl' f acc $ treeList t
 -- exercise 3
 
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel bob = foldl' stepper (GL [] 0, GL [] 0)
-    where stepper acc (glWithSubBoss@(GL _ funWithoutBob), glWithoutSubBoss@(GL _ funWithBob)) =
-            (glWithSubBoss, glWithSubBoss)
+nextLevel bob xs =
+    let (withBosses, withoutBosses) = foldl' stepper (mempty, mempty) xs
+    in (withBosses, glCons bob withoutBosses)
+    where stepper (glWithOrig, glWithoutOrig) (glWith, glWithout) =
+            (glWithOrig <> glWith, glWithoutOrig <> glWithout)
+
+-- exercise 4
+
+guestLists :: Tree Employee -> [(GuestList, GuestList)]
+guestLists (Node emp []) = [(GL [emp] (empFun emp), mempty)]
+guestLists (Node emp xs) =
+    let gls = concat $ map guestLists xs
+    in gls
+
+--maxFun :: Tree Employee -> GuestList
