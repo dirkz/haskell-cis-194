@@ -57,3 +57,69 @@ posInt = Parser f
 ------------------------------------------------------------
 -- Your code goes below here
 ------------------------------------------------------------
+
+-- exercise 1
+
+first :: (a -> b) -> (a,c) -> (b,c)
+first f (a,c) = (f a, c)
+
+instance Functor Parser where
+    fmap f parser = Parser parserFun
+        where parserFun s =
+                let res = runParser parser s
+                in case res of
+                    Nothing -> Nothing
+                    Just (a, c) -> Just (f a, c)
+
+-- exercise 2
+
+instance Applicative Parser where
+    pure a = Parser (\_ -> Just (a,[]))
+    p1 <*> p2 = Parser parseFun
+        where parseFun s =
+                let r1 = runParser p1 s
+                in case r1 of
+                    Nothing -> Nothing
+                    Just (f,c1) ->
+                        let r2 = runParser p2 c1
+                        in case r2 of
+                            Nothing -> Nothing
+                            Just (a2,c2) -> Just (f a2, c2)
+
+-- exercise 3
+
+abParser :: Parser (Char, Char)
+abParser = (,) <$> char 'a' <*> char 'b'
+
+abParser_ :: Parser ()
+abParser_ = (\_ _ -> ()) <$> char 'a' <*> char 'b'
+
+intPair :: Parser [Integer]
+intPair = (\a _ b -> [a, b]) <$> posInt <*> char ' ' <*> posInt
+
+-- exercise 4
+
+instance Alternative Parser where
+    empty = Parser (\_ -> Nothing)
+    p1 <|> p2 = Parser (\s -> runParser p1 s <|> runParser p2 s)
+
+-- exercise 5
+
+parseString :: (Char -> Bool) -> Parser String
+parseString p =
+    Parser (\s ->
+        let (ns, rest) = span p s
+        in case ns of
+            [] -> Nothing
+            otherwise -> Just (ns, rest))
+
+satisfyCharString :: (Char -> Bool) -> Parser String
+satisfyCharString p = Parser f
+  where
+    f [] = Nothing
+    f (x:xs)
+        | p x       = Just ([x], xs)
+        | otherwise = Nothing
+
+intOrUppercase :: Parser ()
+intOrUppercase = (\_ -> ()) <$> (parseString isDigit <|> satisfyCharString isUpper)
