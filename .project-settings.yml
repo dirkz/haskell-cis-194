@@ -14,3 +14,4 @@ ghc-args: []
 excluded-modules:
 - 01/Week01.hs
 - 04/Week04.hs
+- 10/AParser.hs
